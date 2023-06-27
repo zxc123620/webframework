@@ -40,3 +40,5 @@ def random_phone_number():
     return phone
 
 
+def aaa(a, b):
+    return str(a) + str(b)

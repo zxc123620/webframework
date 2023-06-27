@@ -1,0 +1,53 @@
+-
+  id: "注册成功"
+  phone_number: "{{random_phone_number()}}"
+  password: "123456abc"
+
+-
+  id: "注册失败-电话号码不准确"
+  phone_number: "123456"
+  password: "123456"
+  expect_msg: "手机号格式不正确！"
+
+-
+  id: "注册失败-电话号码被注册"
+  phone_number: "15708132743"
+  password: "123456"
+  expect_msg: "该手机号已注册！"
+
+-
+  id: "注册失败-手机号为空"
+  phone_number: ""
+  password: "123456"
+  expect_msg: "手机号不能为空！"
+
+-
+  id: "注册失败-密码为空"
+  phone_number: "{{random_phone_number()}}"
+  password: ""
+  expect_msg: "密码不能为空！"
+
+-
+  id: "注册失败-没输入验证码"
+  phone_number: "{{random_phone_number()}}"
+  password: "123456"
+  expect_msg: "验证码不能为空！"
+
+-
+  id: "注册失败-密码小于6位"
+  phone_number: "{{random_phone_number()}}"
+  password: "12345"
+  expect_msg: ""
+
+-
+  id: "注册失败-密码大于20位"
+  phone_number: "{{random_phone_number()}}"
+  password: "123456789123456789123"
+  expect_msg: ""
+
+-
+  id: "注册失败-验证码错误"
+  phone_number: "{{random_phone_number()}}"
+  password: "123456abc"
+  code: "errorcode"
+  expect_msg: "验证码错误！"

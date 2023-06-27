@@ -1,6 +1,7 @@
+import time
+
 import allure
-from selenium import webdriver
-from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
 from config import ROOT_PATH
@@ -9,13 +10,20 @@ from utils.page_utils.other_function import identify_the_captcha
 
 
 class BasePage:
-    def __init__(self):
+    def __init__(self, driver: WebDriver):
         """
         初始化driver对象
         """
-        self.driver = webdriver.Chrome()
-        self.driver.maximize_window()
+        self.driver = driver
         self.window_handles = []
+
+    @property
+    def title(self):
+        return self.driver.title
+
+    @property
+    def url(self):
+        return self.driver.current_url
 
     @allure.step("前往页面")
     def go_to(self, url):
@@ -41,7 +49,6 @@ class BasePage:
                 if window_handle not in self.window_handles:
                     self.window_handles.append(window_handle)
 
-    @allure.step("定位单个元素")
     def locate(self, *locator) -> WebElement:
         """
         定位元素操作
@@ -55,18 +62,19 @@ class BasePage:
         except Exception as e:
             raise ElementNotFound("元素找不到: %s" % e.args)
 
-    @allure.step("元素截图")
-    def save_element_image(self, *locator):
+    @allure.step("保存图片")
+    def save_element_image(self, png_name, *locator):
         """
         元素截图
+        :param png_name: 图片名称
         :param locator:
         :return:
         """
-        file_path = ROOT_PATH + "/temp/temp.png"
+        file_path = ROOT_PATH + f"/temp/{png_name}.png"
         self.locate(*locator).screenshot(file_path)
         return file_path
 
-    @allure.step("识别验证码")
+    @allure.step("获取验证码")
     def get_captcha_number(self, path):
         """
         识别验证码
@@ -75,7 +83,6 @@ class BasePage:
         """
         return identify_the_captcha(path)
 
-    @allure.step("定位多个元素")
     def locates(self, *locator) -> list:
         """
         定位多个元素
@@ -90,7 +97,6 @@ class BasePage:
         except Exception as e:
             raise ElementNotFound("元素找不到: %s" % e.args)
 
-    @allure.step("输入内容")
     def input(self, content, *locator):
         """
         输入内容
@@ -98,9 +104,10 @@ class BasePage:
         :param locator:
         :return:
         """
+        self.locate(*locator).clear()
         self.locate(*locator).send_keys(content)
+        time.sleep(0.3)
 
-    @allure.step("切换页面")
     def switch_frame(self, *locator):
         """
         切换内嵌frame
@@ -109,7 +116,6 @@ class BasePage:
         """
         self.driver.switch_to_frame(self.locate(*locator))
 
-    @allure.step("点击操作")
     def click_element(self, *locator):
         """
         点击事件
@@ -117,7 +123,9 @@ class BasePage:
         :return:
         """
         self.locate(*locator).click()
+        time.sleep(0.3)
 
+    @allure.step("切换页面")
     def switch_window_by_title(self, title):
         """
         根据页面标题切换页面
@@ -151,9 +159,5 @@ class BasePage:
             "border: 2px solid green;"
         )
 
-
-if __name__ == '__main__':
-    base_page = BasePage()
-    base_page.go_to("http://novel.hctestedu.com/user/register.html")
-    base_page.save_element_image(By.ID, "chkd")
-    print(base_page.get_captcha_number())
+    def get_text(self, *locator):
+        return self.locate(*locator).text
